@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
@@ -61,16 +62,16 @@ public class TweetServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		// setting hashTag object for testing
+		// setting hashTag and tweet object for testing
 		tweet = new Tweet();
 		tweet.setTweet("I love web development with java #java");
-
-		// setting hashTag object for testing
 		hashTag = new HashTag("java");
 
+		// setting optional hashTag object for testing
+		Optional<HashTag> hashTagOptional = Optional.of(hashTag);
+
 		// Mocking the response from dependencies
-		doReturn(Boolean.TRUE).when(hashTagService).isHashTagExists(any());
-		doReturn(hashTag).when(hashTagService).getByTagName(any());
+		doReturn(hashTagOptional).when(hashTagService).getByTagName(any());
 		doReturn(tweet).when(tweetRepository).save(any());
 	}
 

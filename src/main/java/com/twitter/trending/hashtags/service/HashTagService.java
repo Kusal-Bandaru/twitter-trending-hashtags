@@ -3,6 +3,7 @@
  */
 package com.twitter.trending.hashtags.service;
 
+import java.util.Optional;
 import java.util.Set;
 
 import com.twitter.trending.hashtags.model.HashTag;
@@ -17,20 +18,12 @@ import com.twitter.trending.hashtags.model.HashTag;
 public interface HashTagService {
 
 	/**
-	 * Checks if the given hashtag exits in the DB
-	 * 
-	 * @param hashTagName HashTag to be searched
-	 * @return boolean representing true if HashTag exits and false it it doesn't
-	 */
-	public boolean isHashTagExists(String hashTagName);
-
-	/**
-	 * Retrieve the HashTag object from the DB
+	 * Retrieve the HashTag object from the DB if present
 	 * 
 	 * @param hashTagName Hashtag to be fetched
-	 * @return HashTag object
+	 * @return Option<HashTag> object
 	 */
-	public HashTag getByTagName(String hashTagName);
+	public Optional<HashTag> getByTagName(String hashTagName);
 
 	/**
 	 * Retrieves the Top 10 Trending Hashtags.

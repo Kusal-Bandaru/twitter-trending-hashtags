@@ -2,6 +2,7 @@ package com.twitter.trending.hashtags.service.impl;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -75,17 +76,18 @@ public class TweetServiceImpl implements TweetService {
 			 * already to avoid duplicate creation of Hashtags.
 			 */
 			for (String hashTagName : extractedHashTags) {
-				if (hashTagService.isHashTagExists(hashTagName)) { // check if hashtag is already present in DB
-					hashTag = hashTagService.getByTagName(hashTagName); // fetch the hashtag from DB
+				Optional<HashTag> hashTagOptional = hashTagService.getByTagName(hashTagName);
+				if (hashTagOptional.isPresent()) { 					// check if hashtag is already present in DB
+					hashTag = hashTagOptional.get(); 				// fetch the hashtag from DB
 					hashTag.setTagCount(hashTag.getTagCount() + 1); // Incrementing the tagged count for hashtag
 				} else {
-					hashTag = new HashTag(hashTagName); // Creating a new Hashtag with default count: 1
+					hashTag = new HashTag(hashTagName);				// Creating a new Hashtag with default count: 1
 				}
 				hashTags.add(hashTag);
 			}
 			tweet.setHashTags(hashTags);
 			LOGGER.info("HashTags retrieved from the tweet: {}", Arrays.toString(hashTags.toArray()));
-			createdTweet = tweetRepository.save(tweet); // saving the tweet
+			createdTweet = tweetRepository.save(tweet); 			// saving the tweet
 		} catch (Exception e) {
 			throw new ServiceException(e.getMessage());
 		}
@@ -103,7 +105,7 @@ public class TweetServiceImpl implements TweetService {
 
 		Set<String> hashTags = new HashSet<>();
 
-		Matcher matcher = EXTRACT_HASHTAGS_PATTERN.matcher(tweet); // performing match operations for tweet with the
+		Matcher matcher = EXTRACT_HASHTAGS_PATTERN.matcher(tweet); 	// performing match operations for tweet with the
 																	// pattern
 		while (matcher.find()) {
 			hashTags.add(matcher.group(1)); // adding the found hashtag from the tweet to the set of hashtags

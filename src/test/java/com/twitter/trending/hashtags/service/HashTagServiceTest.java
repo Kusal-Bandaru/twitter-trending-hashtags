@@ -3,6 +3,7 @@ package com.twitter.trending.hashtags.service;
 import static org.mockito.Mockito.doReturn;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
@@ -37,39 +38,21 @@ public class HashTagServiceTest {
 	private HashTagRepository hashTagRepository;
 
 	/**
-	 * Test the isHashTag exists method if hash tag exists in DB
-	 */
-	@Test
-	public void testIsHashTagExists() {
-		// Setting hashtags for testing
-		HashTag javaHashTag = new HashTag("java");
-		HashTag springHashTag = new HashTag("spring");
-
-		// Mocking repository response
-		doReturn(Boolean.TRUE).when(hashTagRepository).existsById(javaHashTag.getTagName());
-		doReturn(Boolean.FALSE).when(hashTagRepository).existsById(springHashTag.getTagName());
-
-		// Assert the response
-		Assertions.assertTrue(hashTagService.isHashTagExists(javaHashTag.getTagName()));
-		Assertions.assertFalse(hashTagService.isHashTagExists(springHashTag.getTagName()));
-	}
-
-	/**
 	 * Test the get HashTag By TagName method
 	 */
 	@Test
 	public void testGetByTagName() {
 		// Setting hashtags for testing
-		HashTag javaHashTag = new HashTag("java");
+		Optional<HashTag> javaHashTag = Optional.of(new HashTag("java"));
 
 		// Mocking repository response
-		doReturn(javaHashTag).when(hashTagRepository).getOne(javaHashTag.getTagName());
+		doReturn(javaHashTag).when(hashTagRepository).findById(javaHashTag.get().getTagName());
 
 		// Fetching response from service
-		HashTag response = hashTagService.getByTagName(javaHashTag.getTagName());
+		Optional<HashTag> response = hashTagService.getByTagName(javaHashTag.get().getTagName());
 
 		// Assert statements
-		Assertions.assertEquals(response, javaHashTag);
+		Assertions.assertEquals(javaHashTag, response);
 
 	}
 
