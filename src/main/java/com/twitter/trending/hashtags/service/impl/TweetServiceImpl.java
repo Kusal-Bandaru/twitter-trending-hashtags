@@ -63,7 +63,7 @@ public class TweetServiceImpl implements TweetService {
 	@Override
 	public Tweet newTweet(Tweet tweet) throws ServiceException {
 
-		Set<HashTag> hashTags = new HashSet<>();
+		Set<HashTag> hashTagsInTweet = new HashSet<>();
 		Tweet createdTweet = null;
 		HashTag hashTag;
 
@@ -77,17 +77,17 @@ public class TweetServiceImpl implements TweetService {
 			 */
 			for (String hashTagName : extractedHashTags) {
 				Optional<HashTag> hashTagOptional = hashTagService.getByTagName(hashTagName);
-				if (hashTagOptional.isPresent()) { 					// check if hashtag is already present in DB
-					hashTag = hashTagOptional.get(); 				// fetch the hashtag from DB
+				if (hashTagOptional.isPresent()) { // check if hashtag is already present in DB
+					hashTag = hashTagOptional.get(); // fetch the hashtag from DB
 					hashTag.setTagCount(hashTag.getTagCount() + 1); // Incrementing the tagged count for hashtag
 				} else {
-					hashTag = new HashTag(hashTagName);				// Creating a new Hashtag with default count: 1
+					hashTag = new HashTag(hashTagName); // Creating a new Hashtag with default count: 1
 				}
-				hashTags.add(hashTag);
+				hashTagsInTweet.add(hashTag);
 			}
-			tweet.setHashTags(hashTags);
-			LOGGER.info("HashTags retrieved from the tweet: {}", Arrays.toString(hashTags.toArray()));
-			createdTweet = tweetRepository.save(tweet); 			// saving the tweet
+			tweet.setHashTags(hashTagsInTweet);
+			LOGGER.info("HashTags retrieved from the tweet: {}", Arrays.toString(hashTagsInTweet.toArray()));
+			createdTweet = tweetRepository.save(tweet); // saving the tweet
 		} catch (Exception e) {
 			throw new ServiceException(e.getMessage());
 		}
@@ -103,14 +103,14 @@ public class TweetServiceImpl implements TweetService {
 	 */
 	private Set<String> extractHashTagsFromTweet(String tweet) {
 
-		Set<String> hashTags = new HashSet<>();
+		Set<String> extractedHashTags = new HashSet<>();
 
-		Matcher matcher = EXTRACT_HASHTAGS_PATTERN.matcher(tweet); 	// performing match operations for tweet with the
+		Matcher matcher = EXTRACT_HASHTAGS_PATTERN.matcher(tweet); // performing match operations for tweet with the
 																	// pattern
 		while (matcher.find()) {
-			hashTags.add(matcher.group(1)); // adding the found hashtag from the tweet to the set of hashtags
+			extractedHashTags.add(matcher.group(1)); // adding the found hashtag from the tweet to the set of hashtags
 		}
-		return hashTags;
+		return extractedHashTags;
 	}
 
 }
