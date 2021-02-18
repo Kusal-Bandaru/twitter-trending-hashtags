@@ -21,10 +21,10 @@ mvn spring-boot:run
 
 [H2 Database](https://www.h2database.com/html/main.html) is used which provides embedded DB. It is used to facilitate the testing purposes so that the over head about configuring the local database in different systems can be avoided. However, H2 comes with volatile memory which means that the data will be lost when we stop serving the application.
 
-H2 provides a console with user interface which can be accessed through a browser from below URL.
+H2 provides a console with user interface which can be accessed through a browser from below URL. Port in the below URL specifies the local port where the application is being served.
 
 ```
-http://localhost:8080/h2-console
+http://localhost:port/h2-console
 ```
 Below is the JDBC URL to connect to the DB. We can connect to the DB with defauls credentials itself.
 ```
