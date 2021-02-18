@@ -44,7 +44,7 @@ public class TweetController {
 	 * 
 	 * @return Welcome Message
 	 */
-	@GetMapping(value = "/")
+	@GetMapping
 	@ApiOperation(value = "Welcome message", httpMethod = "GET", consumes = "application/json")
 	public String welcomeMessage() {
 		return "Welcome to Twitter API service";
