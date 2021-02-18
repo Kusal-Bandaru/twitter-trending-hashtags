@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -25,22 +26,35 @@ import io.swagger.annotations.ApiModelProperty;
  */
 
 @Entity
+@Table(name = "tweet")
 public class Tweet {
-
+	
+	/**
+	 * tweet_id is the primary key for the tweet table which will be auto incremented
+	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "tweet_id")
 	@ApiModelProperty(notes = "The database generated tweet ID")
 	private int id;
 
+	/**
+	 * Username of the user that submitted the tweet
+	 */
 	@Column(name = "user_name")
 	@ApiModelProperty(notes = "Username of the user that submitted the tweet")
 	private String userName;
 
+	/**
+	 * Actual tweet string submitted by user
+	 */
 	@Column(name = "tweet")
 	@ApiModelProperty(notes = "Tweet string")
 	private String tweet;
 
+	/**
+	 * Many to many mapping for tweet_tag table which will be created for joining tweets and hashtags
+	 */
 	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "tweet_tag", 
 	joinColumns = @JoinColumn(name = "tweet_id", referencedColumnName = "tweet_id"), 
@@ -50,12 +64,13 @@ public class Tweet {
 	private Set<HashTag> hashTags = new HashSet<>();
 
 	/**
-	 * 
+	 * default no args constructor
 	 */
 	public Tweet() {
 	}
 
 	/**
+	 * default all args constructor
 	 * @param id
 	 * @param userName
 	 * @param tweet

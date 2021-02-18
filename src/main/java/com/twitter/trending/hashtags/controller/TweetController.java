@@ -1,5 +1,7 @@
 package com.twitter.trending.hashtags.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.twitter.trending.hashtags.exception.ServiceException;
 import com.twitter.trending.hashtags.model.Tweet;
 import com.twitter.trending.hashtags.service.TweetService;
 
@@ -28,6 +31,11 @@ import io.swagger.annotations.ApiOperation;
 @Api(value = "Tweet Controller", tags = { "API for adding new tweets" }) // API info for swagger
 public class TweetController {
 
+	/**
+	 * Logger for this class
+	 */
+	private static final Logger LOGGER = LoggerFactory.getLogger(TweetController.class);
+
 	@Autowired
 	private TweetService tweetService;
 
@@ -38,7 +46,6 @@ public class TweetController {
 	 */
 	@GetMapping(value = "/")
 	@ApiOperation(value = "Welcome message", httpMethod = "GET", consumes = "application/json")
-	// API Operation info for swagger
 	public String welcomeMessage() {
 		return "Welcome to Twitter API service";
 	}
@@ -52,9 +59,14 @@ public class TweetController {
 	@PostMapping(value = "/new")
 	@ResponseStatus(HttpStatus.CREATED)
 	@ApiOperation(value = "Add new tweet", httpMethod = "POST", consumes = "application/json")
-	// API Operation info for swagger
 	public Tweet newTweet(@RequestBody Tweet tweet) {
-		return tweetService.newTweet(tweet);
+		Tweet responseTweet = null;
+		try {
+			responseTweet = tweetService.newTweet(tweet);
+		} catch (ServiceException e) {
+			LOGGER.error("Service exception occurred while saving the tweet Exception Message : {}", e.getMessage());
+		}
+		return responseTweet;
 	}
 
 }

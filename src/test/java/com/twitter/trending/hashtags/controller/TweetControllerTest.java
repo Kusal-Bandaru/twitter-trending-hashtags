@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.twitter.trending.hashtags.controller;
 
 import java.net.MalformedURLException;
@@ -19,20 +16,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
 
-/**
- * Controller Test to verify the API endnpoints
- * 
- * @author Kusal
- *
- */
+import com.twitter.trending.hashtags.model.Tweet;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class HashTagControllerTest {
+public class TweetControllerTest {
 
 	/**
 	 * Logger for the class
 	 */
-	private static final Logger LOGGER = LoggerFactory.getLogger(HashTagControllerTest.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(TweetControllerTest.class);
 
 	/**
 	 * bind the RANDOM_PORT generated in SpringBootTest annotation above
@@ -47,18 +39,37 @@ public class HashTagControllerTest {
 	private TestRestTemplate restTemplate;
 
 	/**
-	 * Test to verify that proper response is returned from top10Trending API
+	 * Test method to test the Welcome Message API endpoint
 	 */
 	@Test
-	public void testTop10TrendingHashTags() {
+	public void testWelcomeMessage() {
 		ResponseEntity<String> response = null;
 		try {
 			response = restTemplate.getForEntity(
-					new URL("http://localhost:" + port + "/api/v1/twitter/hashtags/top10Trending").toString(),
-					String.class);
+					new URL("http://localhost:" + port + "/api/v1/twitter/tweets/").toString(), String.class);
 		} catch (RestClientException | MalformedURLException e) {
 			LOGGER.error(e.getMessage());
 		}
 		Assertions.assertEquals(HttpStatus.OK, response != null ? response.getStatusCode() : null);
+		Assertions.assertEquals("Welcome to Twitter API service", response != null ? response.getBody() : null);
 	}
+
+	/**
+	 * Test method for adding a new tweet and check the created status
+	 */
+	@Test
+	public void testAddingNewTweet() {
+		ResponseEntity<String> response = null;
+		try {
+			Tweet tweet = new Tweet();
+			tweet.setTweet("I love java #java"); // creating a new tweet object to post
+			response = restTemplate.postForEntity(
+					new URL("http://localhost:" + port + "/api/v1/twitter/tweets/new").toString(), tweet, String.class);
+		} catch (RestClientException | MalformedURLException e) {
+			LOGGER.error(e.getMessage());
+		}
+		LOGGER.info(response.getBody());
+		Assertions.assertEquals(HttpStatus.CREATED, response != null ? response.getStatusCode() : null);
+	}
+
 }

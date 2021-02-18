@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.twitter.trending.hashtags.exception.ServiceException;
 import com.twitter.trending.hashtags.model.HashTag;
 import com.twitter.trending.hashtags.model.Tweet;
 import com.twitter.trending.hashtags.repository.TweetRepository;
@@ -56,28 +57,40 @@ public class TweetServiceImpl implements TweetService {
 	 * 
 	 * @param tweet
 	 * @return status of the creation along with the created tweet object
+	 * @throws ServiceException
 	 */
 	@Override
-	public Tweet newTweet(Tweet tweet) {
+	public Tweet newTweet(Tweet tweet) throws ServiceException {
 
 		Set<HashTag> hashTags = new HashSet<>();
+		Tweet createdTweet = null;
 		HashTag hashTag;
 
-		LOGGER.info("Received tweet: {}", tweet.getTweet());
-		Set<String> extractedHashTags = extractHashTagsFromTweet(tweet.getTweet());
+		try {
+			LOGGER.info("Received tweet: {}", tweet.getTweet());
+			Set<String> extractedHashTags = extractHashTagsFromTweet(tweet.getTweet());
 
-		for (String hashTagName : extractedHashTags) {
-			if (hashTagService.isHashTagExists(hashTagName)) {
-				hashTag = hashTagService.getByTagName(hashTagName);
-				hashTag.setTagCount(hashTag.getTagCount() + 1);
-			} else {
-				hashTag = new HashTag(hashTagName);
+			/*
+			 * Iterating through the set of hashtags and fetching it from the DB if present
+			 * already to avoid duplicate creation of Hashtags.
+			 */
+			for (String hashTagName : extractedHashTags) {
+				if (hashTagService.isHashTagExists(hashTagName)) { // check if hashtag is already present in DB
+					hashTag = hashTagService.getByTagName(hashTagName); // fetch the hashtag from DB
+					hashTag.setTagCount(hashTag.getTagCount() + 1); // Incrementing the tagged count for hashtag
+				} else {
+					hashTag = new HashTag(hashTagName); // Creating a new Hashtag with default count: 1
+				}
+				hashTags.add(hashTag);
 			}
-			hashTags.add(hashTag);
+			tweet.setHashTags(hashTags);
+			LOGGER.info("HashTags retrieved from the tweet: {}", Arrays.toString(hashTags.toArray()));
+			createdTweet = tweetRepository.save(tweet); // saving the tweet
+		} catch (Exception e) {
+			throw new ServiceException(e.getMessage());
 		}
-		tweet.setHashTags(hashTags);
-		LOGGER.info("HashTags retrieved from the tweet: {}", Arrays.toString(hashTags.toArray()));
-		return tweetRepository.saveAndFlush(tweet);
+
+		return createdTweet;
 	}
 
 	/**
@@ -90,10 +103,10 @@ public class TweetServiceImpl implements TweetService {
 
 		Set<String> hashTags = new HashSet<>();
 
-		Matcher matcher = EXTRACT_HASHTAGS_PATTERN.matcher(tweet);
-
+		Matcher matcher = EXTRACT_HASHTAGS_PATTERN.matcher(tweet); // performing match operations for tweet with the
+																	// pattern
 		while (matcher.find()) {
-			hashTags.add(matcher.group(1));
+			hashTags.add(matcher.group(1)); // adding the found hashtag from the tweet to the set of hashtags
 		}
 		return hashTags;
 	}

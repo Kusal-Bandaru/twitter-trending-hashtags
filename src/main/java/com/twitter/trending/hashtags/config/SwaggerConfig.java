@@ -9,20 +9,30 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+/**
+ * SwaggerConfig is the config class for swagger which facilitates in
+ * documenting the API details.
+ * 
+ * @author Kusal
+ *
+ */
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
-	
+
+	/**
+	 * Docket instance provides the API configuration which helps in integration
+	 * with Spring Boot
+	 * 
+	 * @return
+	 */
 	@Bean
-    public Docket api(){
-        return new Docket(DocumentationType.SWAGGER_2)
-                .select()
-                .apis( RequestHandlerSelectors.basePackage( "com.twitter.trending.hashtags" )) .build()
-                .apiInfo(new ApiInfoBuilder()
-                        .title("Twitter Trending Hashtags Service")
-                        .description("Retrieves the top 10 tags for the input tweets").build()
-                )
-                .enable(true);
-    }
+	public Docket api() {
+		return new Docket(DocumentationType.SWAGGER_2).select()
+				.apis(RequestHandlerSelectors.basePackage("com.twitter.trending.hashtags")).build()
+				.apiInfo(new ApiInfoBuilder().title("Twitter Trending Hashtags Service")
+						.description("Retrieves the top 10 tags for the input tweets").build())
+				.enable(true);
+	}
 
 }
